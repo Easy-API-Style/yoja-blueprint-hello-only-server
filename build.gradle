@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.easygoingapi:yoja-http-server:1.0.0'
+    implementation 'com.easygoingapi:yoja-http-server:1.0.1'
     
     implementation 'ch.qos.logback:logback-classic:1.5.32'
     implementation 'org.slf4j:slf4j-api:2.0.17'

@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 'use strict'
-
-const apiVersion = '1.0.0';
+const apiVersion = '1.0.1';
+console.info('yojaWeb apiVersion: ', apiVersion);
+const scriptTag = [...document.querySelectorAll('script[type="module"]')]
+                       .find(s => s.src && new URL(s.src).href === import.meta.url);
 
 const sectionDescriptions = [];
 
@@ -106,11 +108,15 @@ function formatPathFrom(path, fromPath, options) {
 
 // config
 let config = {};
+
 try {
-    const configModule = await import(formatPath('/YojaWeb.conf.js', {force: true, version: false}))
-                                  .catch(error => console.warn('yojaWew no config file: /YojaWeb.conf.js', {cause: error}));
-    if (configModule.default) {
-       config = configModule.default;
+    const configPath = scriptTag?.getAttribute('yw-config-path');
+    if (configPath) {
+        const configModule = await import(formatPath(configPath, {force: true, version: false}))
+                                     .catch(error => console.warn('yojaWeb no config file: ' + configPath, {cause: error}));
+        if (configModule.default) {
+            config = configModule.default;
+        }
     }
 }
 catch(error) {
@@ -1221,7 +1227,7 @@ function cloneSection(section) {
     if (section.include) {
         type = 'include';
     }
-    else if (section.include) {
+    else if (section.slot) {
         type = 'slot';
     }
     result.type = type;
@@ -1312,7 +1318,7 @@ function addCssMediaListener(cssSheetEntities, shadow) {
         if (cssMedia) {
             shadow.adoptedStyleSheets.push(cssSheetEmpty);
             const mediaQueryList = window.matchMedia(cssMedia);
-            mediaQueryList.addListener(mql => handleCssMedia(mql, shadow, i, cssSheet));
+            mediaQueryList.addEventListener('change', mql => handleCssMedia(mql, shadow, i, cssSheet));
             handleCssMedia(mediaQueryList, shadow, i, cssSheet);
         }
         else {
